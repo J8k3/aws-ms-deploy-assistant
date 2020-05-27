@@ -81,7 +81,7 @@ namespace AWSDeploymentAssistant
                 using (CommandLine.Parser parser = new Parser(settings => Program.ConfigureSettings(settings))) {
                     var result = parser.ParseArguments<ProfileRequest, BuildRequest>(args)
                         .WithParsed<ProfileRequest>(request => exitCode = Program.RunProfileRequest(request))
-                        .WithParsed<BuildRequest>(request => exitCode = Program.RunBuildReqeust(request))
+                        .WithParsed<BuildRequest>(request => exitCode = Program.RunBuildRequest(request))
                         .WithNotParsed(errors => {
                             foreach (Error error in errors) {
                                 Type t = error.GetType();
@@ -157,7 +157,7 @@ namespace AWSDeploymentAssistant
             return result;
         }
 
-        private static int RunBuildReqeust(BuildRequest request)
+        private static int RunBuildRequest(BuildRequest request)
         {
             int result = Program.ERROR_BUILD_REQUEST_FAILED;
 
@@ -255,7 +255,7 @@ namespace AWSDeploymentAssistant
 
         public static AWSCredentials GetAWSCredentials(string profileName)
         {
-            AWSCredentials credendial = null;
+            AWSCredentials credential = null;
 
             var file = Program.GetCredentialStore();
 
@@ -263,12 +263,12 @@ namespace AWSDeploymentAssistant
             file.TryGetProfile(profileName, out profile);
 
             if (profile != null) {
-                credendial = profile.GetAWSCredentials(file);
+                credential = profile.GetAWSCredentials(file);
             }
 
             Program.Logger.Debug(string.Format("Request for profile [{0}] returned [{1}]", profileName, profile));
 
-            return credendial;
+            return credential;
         }
 
         private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
