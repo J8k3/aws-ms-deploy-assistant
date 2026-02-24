@@ -5,13 +5,17 @@
 // KIND, either express or implied. See the License for the specific language governing permissions and limitations
 // under the License.
 using log4net.Config;
-using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("AWS Deployment Assistant")]
 [assembly: AssemblyDescription("This tool enables automation of build output upload to the AWS S3 service.")]
+[assembly: AssemblyCompany("Jacob Marks")]
+[assembly: AssemblyProduct("AWS EC2 Deployment Assistant for Microsoft Developer Platforms")]
+[assembly: AssemblyCopyright("Copyright © 2016 Amazon.com, Inc. or its affiliates. Forked and maintained by Jacob Marks.")]
+
+[assembly: ComVisible(false)]
 [assembly: Guid("3396b4f3-7c27-4f6d-b512-0b3d5cdff9ad")]
-[assembly: AssemblyVersion("1.0.0.*")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+
+[assembly: AssemblyVersion("1.0.*")]
 [assembly: XmlConfigurator(Watch = true)]
