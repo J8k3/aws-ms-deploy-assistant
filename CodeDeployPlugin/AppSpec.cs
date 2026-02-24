@@ -99,7 +99,7 @@ namespace CodeDeployPlugin
     {
         public HookEvent()
         {
-            this.Timeout = Settings.Default.DefaultEventTimeout;
+            this.Timeout = Properties.Settings.Default.DefaultEventTimeout;
         }
 
         [YamlMember(Alias = "location", Order = 1, ScalarStyle = YamlDotNet.Core.ScalarStyle.DoubleQuoted)]

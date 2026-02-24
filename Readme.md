@@ -1,6 +1,12 @@
 # AWS EC2 Deployment Assistant for Microsoft Developer Platforms
+
+## About This Repository
+
+This project was originally developed by Jacob Marks during his early tenure at Amazon. This fork of the AWS Labs repository serves to maintain continuity of Jacob's code contributions and preserve the work for reference and ongoing development.
+
+## Overview
  
-Deployment automation from Microsoft Developer platforms (Microsoft Visual Studio and/or Microsoft Team Foundation Server) to AWS EC2 instances is a common customer requirement. AWS Developer Tools can support the continuos delivery/continuous deployment requirements for AWS customers leveraging these development platforms at a very low cost while monitoring and maintaining application availability. This capability comes through the AWS CodePipline and CodeDeploy services that can consume the precomipled output of the Microsoft Build System. To begin this pipeline, build output must be packaged and uploaded to an AWS S3 staging location where it is pickedup by the AWS CodePipeline service and can then flow through a customer defined continous delivery workflow.
+Deployment automation from Microsoft Developer platforms (Microsoft Visual Studio and/or Microsoft Team Foundation Server) to AWS EC2 instances is a common customer requirement. AWS Developer Tools can support the continuous delivery/continuous deployment requirements for AWS customers leveraging these development platforms at a very low cost while monitoring and maintaining application availability. This capability comes through the AWS CodePipeline and CodeDeploy services that can consume the precompiled output of the Microsoft Build System. To begin this pipeline, build output must be packaged and uploaded to an AWS S3 staging location where it is picked up by the AWS CodePipeline service and can then flow through a customer defined continuous delivery workflow.
  
 ### CodePipeline [Learn more >>](https://aws.amazon.com/codepipeline/)
 AWS CodePipeline is a continuous delivery service for fast and reliable application updates.
@@ -9,7 +15,7 @@ AWS CodePipeline is a continuous delivery service for fast and reliable applicat
 AWS CodeDeploy is a service that automates code deployments to any instance, including Amazon EC2 instances and instances running on-premises.
  
 ## The Tool 
-The AWS EC2 Deployment Assistant for Microsoft Developer Platforms is a utility application that enables integration of the AWS CodePipeline and CodeDeploy Services into the Visual Studio or Team Foundation Server build process. It handles the packaging and upload of successful builds to the AWS S3 service staging location where it is pickedup by the AWS CodePipeline service and can then flow through a customer defined continous delivery workflow.
+The AWS EC2 Deployment Assistant for Microsoft Developer Platforms is a utility application that enables integration of the AWS CodePipeline and CodeDeploy Services into the Visual Studio or Team Foundation Server build process. It handles the packaging and upload of successful builds to the AWS S3 service staging location where it is picked up by the AWS CodePipeline service and can then flow through a customer defined continuous delivery workflow.
  
 #### Features
  
@@ -26,9 +32,9 @@ The AWS EC2 Deployment Assistant for Microsoft Developer Platforms is a utility 
   * Enables command line management of stored credential profiles   
    
 ## How It Works
-Using Visual Studio Post Build Events, MSBuild Events or a customized Team Foundation Server (TFS) Build Template, the AWS Deployment Assistant runs against a sucessful builds output.
+Using Visual Studio Post Build Events, MSBuild Events or a customized Team Foundation Server (TFS) Build Template, the AWS Deployment Assistant runs against a successful builds output.
  
-![Tool Execution Worflow](https://github.com/awslabs/aws-ms-deploy-assistant/blob/master/DemoSite/Images/process.png "Process Workflow")
+![Tool Execution Workflow](https://github.com/awslabs/aws-ms-deploy-assistant/blob/master/DemoSite/Images/process.png "Process Workflow")
  
 ## Tool Setup
 Today, the AWS EC2 Deployment Assistant requires manually installation for use as part of a DevOps process. You do not need to download or build the projects code if you only wish to use the tool. To setup/install the tool please follow the steps below:
@@ -40,10 +46,10 @@ Today, the AWS EC2 Deployment Assistant requires manually installation for use a
 5. Configure your project(s) to invoke the continuous delivery pipeline after a successful build. A successful builds output can be hooked in several ways and you should pick the option that best matches your DevOps needs.
     * Visual Studio Project Post-Build Event Setup  
       * This option triggers a pipeline on a successful build within Visual Studio. In this example, the build must be run with a build configuration called "Deploy". 
-      * To configure this option, edit the project properties for the project you wish to deploy. On the Build Events table paste the below snipet into the Post Build field. Be sure to update the bucket, profile and zipname attributes for your use case.
+      * To configure this option, edit the project properties for the project you wish to deploy. On the Build Events table paste the below snippet into the Post Build field. Be sure to update the bucket, profile and zipname attributes for your use case.
       
       > "if $(ConfigurationName) == Deploy (  
-      >    "C:\Program Files (x86)\AWS SDK for .NET\bin\Developer Tools\AWSDeploymentAssistant.exe" build --source "$(ProjectDir)." --bucket "useast-my-bucket" --profile “default" --zipname "MyCodePackage.zip"
+      >    "C:\Program Files (x86)\AWS SDK for .NET\bin\Developer Tools\AWSDeploymentAssistant.exe" build --source "$(ProjectDir)." --bucket "useast-my-bucket" --profile ï¿½default" --zipname "MyCodePackage.zip"
       > )  
       
       ![Post Build Event](https://github.com/awslabs/aws-ms-deploy-assistant/blob/master/DemoSite/Images/vspostbuild.png "Post Build Event")
@@ -57,7 +63,7 @@ Today, the AWS EC2 Deployment Assistant requires manually installation for use a
       > \<Exec Command="&quot;C:\Program Files (x86)\AWS Tools\EC2 Deployment Assistant\AWSDeploymentAssistant.exe&quot; build --source &quot;$(MSBuildProjectDirectory)&quot; --bucket &quot;useast-my-bucket&quot; --profile &quot;default&quot; --zipname &quot;MyCodePackage.zip&quot;" Condition="'$(Configuration)'=='Deploy'" /\>
  
       ![MSBuild Event](https://github.com/awslabs/aws-ms-deploy-assistant/blob/master/DemoSite/Images/msbuild-target.png "MSBuild Event")
-6. Configure deployment content filter. When creating a deployment package, the tool filters the file contents that it packages using a configurable “include” and “exclude pattern”.
+6. Configure deployment content filter. When creating a deployment package, the tool filters the file contents that it packages using a configurable ï¿½includeï¿½ and ï¿½exclude patternï¿½.
    * See "PublishFileTypesIncludePattern" for files/paths you wish to include in the AWSDeploymentAssistant.exe.config file.
    * See "PublishFileTypesExcludePattern" for files/paths you wish to exclude in the AWSDeploymentAssistant.exe.config file.  
  
@@ -67,20 +73,20 @@ To configure CodePipeline and CodeDeploy for this tool follow the following step
 1. Walk through the [Simple Pipeline Walkthrough (Amazon S3 Bucket) >>](https://docs.aws.amazon.com/codepipeline/latest/userguide/getting-started-w.html) documentation Steps one thru four.
  
 ## Build Output Preparation Plugins
-The AWS EC2 Deployment Assistant supports extensibility for the preperation of build output. At runtime, the tool loads plugins from the "C:\Program Files (x86)\AWS Tools\EC2 Deployment Assistant\plugins" directory. Plugins can do any number of things to prepare build output for deployment and run with a priority weighting. Plugins can accept input through options json files that include key value pair string values.  Each plugin includes a name attribute set at implementation. Plugins are simply classes within an assembly placed in the plugin folder that Implement the IDeploymentTask interface. Options files are read from the root path of the build content being processed and file names must follow the format “\<PluginName\>.options.json”. The sample CodeDeploy plugin generates a CodeDeploy AppSpec file.
+The AWS EC2 Deployment Assistant supports extensibility for the preparation of build output. At runtime, the tool loads plugins from the "C:\Program Files (x86)\AWS Tools\EC2 Deployment Assistant\plugins" directory. Plugins can do any number of things to prepare build output for deployment and run with a priority weighting. Plugins can accept input through options json files that include key value pair string values.  Each plugin includes a name attribute set at implementation. Plugins are simply classes within an assembly placed in the plugin folder that Implement the IDeploymentTask interface. Options files are read from the root path of the build content being processed and file names must follow the format ï¿½\<PluginName\>.options.jsonï¿½. The sample CodeDeploy plugin generates a CodeDeploy AppSpec file.
  
 ### CodeDeploy Plugin
 The CodeDeploy Plugin will automatically generate an AWS CodeDeploy service deployment definition, an AppSpec.yml file as well as PowerShell scripts to execute a simple deployment to an IIS root site. Options may be specified in a plugin options file "AWSCodeDeployPlugin.options.json" to customize deployment behavior.  For more complex deployment requirements, we recommend that you include an AppSpec file and any required deployment scripts in your build output. If an AppSpec is already present, the AWS EC2 Deployment Assistant will skip auto generation. 
  
 ## Development Environment Setup
-If you would like to develop additional functionality, such as a new plugin, you will need to follow the below setps to get up and running:
+If you would like to develop additional functionality, such as a new plugin, you will need to follow the below steps to get up and running:
  
 1. Clone the "aws-ms-deploy-assistant" repository [Clone >>](https://github.com/awslabs/aws-ms-deploy-assistant.git).
 2. Either manually configure "Tool Setup" as described above, note that you must manually add file system ACLs to allow the copy of build output to the tool runtime path, or run the "Initialize-Environment.ps1" script included in the repository (Local Admin Rights Required). Be sure to replace the account name "\<Domain\\Account\>" in the script with your account details before you run the script. 
 3. Build your environment. 
  
 ### Debugging
-To debug the AWS EC2 Deployment Assitant or any of its plugins, set the "AWSDeploymentAssistant" project as the startup project. Set the debug command line arguments for your environment and then run the solution in debug mode. Be sure to include a leading space in your command argument.  
+To debug the AWS EC2 Deployment Assistant or any of its plugins, set the "AWSDeploymentAssistant" project as the startup project. Set the debug command line arguments for your environment and then run the solution in debug mode. Be sure to include a leading space in your command argument.  
  
 > build --source "\<source path for deploy content\>"" --bucket "useast-my-bucket" --profile "default" --zipname "MyCodePackage.zip"  
  

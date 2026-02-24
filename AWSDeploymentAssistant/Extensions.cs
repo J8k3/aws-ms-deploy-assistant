@@ -44,7 +44,7 @@ namespace AWSDeploymentAssistant
 
         public static string[] ToArray(this StringCollection collection)
         {
-            Assert.IsNotNull(collection, "An collection must be provided.");
+            Assert.IsNotNull(collection, "A collection must be provided.");
 
             string[] values = new string[collection.Count];
 

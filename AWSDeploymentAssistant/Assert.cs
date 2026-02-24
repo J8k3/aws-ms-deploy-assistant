@@ -149,23 +149,23 @@ namespace AWSDeploymentAssistant
             Assert.IsFalse(exists, string.Format("{0} [{1}] was found.", message, path));
         }
 
-        public static void StartsWith(string value, string prefix, StringComparison comparision = StringComparison.OrdinalIgnoreCase, string message = "The value does not start with the expected characters.")
+        public static void StartsWith(string value, string prefix, StringComparison comparison = StringComparison.OrdinalIgnoreCase, string message = "The value does not start with the expected characters.")
         {
             Assert.IsNotNull(value);
             Assert.IsNotNullOrEmptyString(prefix);
 
-            if (value.StartsWith(prefix, comparision) == false)
+            if (value.StartsWith(prefix, comparison) == false)
             {
                 throw new ArgumentException(string.Format("{0} [{1}] should start with [{2}]", message, value, prefix));
             }
         }
 
-        public static void EndsWith(string value, string suffix, StringComparison comparision = StringComparison.OrdinalIgnoreCase, string message = "The value does not end with the expected characters.")
+        public static void EndsWith(string value, string suffix, StringComparison comparison = StringComparison.OrdinalIgnoreCase, string message = "The value does not end with the expected characters.")
         {
             Assert.IsNotNull(value);
             Assert.IsNotNullOrEmptyString(suffix);
 
-            if (value.EndsWith(suffix, comparision) == false)
+            if (value.EndsWith(suffix, comparison) == false)
             {
                 throw new ArgumentException(string.Format("{0} [{1}] should end with [{2}]", message, value, suffix));
             }

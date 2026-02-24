@@ -268,7 +268,7 @@ namespace AWSDeploymentAssistant
                     PutObjectResponse putResponse = client.PutObject(request);
 
                     if (putResponse.HttpStatusCode != System.Net.HttpStatusCode.OK) {
-                        throw new HttpException(int.Parse(putResponse.HttpStatusCode.ToString()), "Failed to upload package to S3.");
+                        throw new HttpException((int)putResponse.HttpStatusCode, "Failed to upload package to S3.");
                     }
                 }
             }

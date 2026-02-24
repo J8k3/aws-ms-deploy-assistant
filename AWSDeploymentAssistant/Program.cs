@@ -47,7 +47,7 @@ namespace AWSDeploymentAssistant
             Program.Logger = LogManager.GetLogger(Settings.Default.DefaultLoggerName);
 
             {
-                var path = Path.Combine(Program.AssemblyPath, "plugins");
+                string path = Path.Combine(Program.AssemblyPath, "plugins");
                 Assert.DirectoryExists(path, "Unable to find task plugin folder path.");
                 Program.TaskPluginFolderPath = path;
             }
@@ -79,27 +79,27 @@ namespace AWSDeploymentAssistant
                 }
 
                 using (CommandLine.Parser parser = new Parser(settings => Program.ConfigureSettings(settings))) {
-                    var result = parser.ParseArguments<ProfileRequest, BuildRequest>(args)
+                    ParserResult<object> result = parser.ParseArguments<ProfileRequest, BuildRequest>(args)
                         .WithParsed<ProfileRequest>(request => exitCode = Program.RunProfileRequest(request))
-                        .WithParsed<BuildRequest>(request => exitCode = Program.RunBuildReqeust(request))
+                        .WithParsed<BuildRequest>(request => exitCode = Program.RunBuildRequest(request))
                         .WithNotParsed(errors => {
                             foreach (Error error in errors) {
                                 Type t = error.GetType();
 
-                                if (t.IsAssignableFrom(typeof(HelpRequestedError)) ||
-                                    t.IsAssignableFrom(typeof(HelpVerbRequestedError)) ||
-                                    t.IsAssignableFrom(typeof(VersionRequestedError)) ||
-                                    t.IsAssignableFrom(typeof(UnknownOptionError))) {
+                                if (t == typeof(HelpRequestedError) ||
+                                    t == typeof(HelpVerbRequestedError) ||
+                                    t == typeof(VersionRequestedError) ||
+                                    t == typeof(UnknownOptionError)) {
                                     // Do Nothing
                                     exitCode = Program.SUCCESS;
-                                } else if (t.IsAssignableFrom(typeof(NoVerbSelectedError)) ||
-                                           t.IsAssignableFrom(typeof(BadFormatTokenError)) ||
-                                           t.IsAssignableFrom(typeof(BadVerbSelectedError)) ||
-                                           t.IsAssignableFrom(typeof(MissingRequiredOptionError)) ||
-                                           t.IsAssignableFrom(typeof(MissingValueOptionError)) ||
-                                           t.IsAssignableFrom(typeof(MutuallyExclusiveSetError)) ||
-                                           t.IsAssignableFrom(typeof(RepeatedOptionError)) ||
-                                           t.IsAssignableFrom(typeof(SequenceOutOfRangeError))) {
+                                } else if (t == typeof(NoVerbSelectedError) ||
+                                           t == typeof(BadFormatTokenError) ||
+                                           t == typeof(BadVerbSelectedError) ||
+                                           t == typeof(MissingRequiredOptionError) ||
+                                           t == typeof(MissingValueOptionError) ||
+                                           t == typeof(MutuallyExclusiveSetError) ||
+                                           t == typeof(RepeatedOptionError) ||
+                                           t == typeof(SequenceOutOfRangeError)) {
                                     Program.Logger.Error(error.Tag);
                                     exitCode = Program.ERROR_BAD_ARGUMENTS;
                                 }
@@ -157,7 +157,7 @@ namespace AWSDeploymentAssistant
             return result;
         }
 
-        private static int RunBuildReqeust(BuildRequest request)
+        private static int RunBuildRequest(BuildRequest request)
         {
             int result = Program.ERROR_BUILD_REQUEST_FAILED;
 
@@ -202,39 +202,40 @@ namespace AWSDeploymentAssistant
         internal static SharedCredentialsFile GetCredentialStore()
         {
 
-            var path = AWSConfigs.AWSProfilesLocation;
+            string path = AWSConfigs.AWSProfilesLocation;
 
             if (string.IsNullOrEmpty(path)) {
                 path = SharedCredentialsFile.DefaultFilePath;
             }
 
-            var file = new Amazon.Runtime.CredentialManagement.SharedCredentialsFile(path);
+            SharedCredentialsFile file = new Amazon.Runtime.CredentialManagement.SharedCredentialsFile(path);
 
             return file;
         }
 
         internal static void RegisterAWSCredentialProfile(string profileName, string accessKey, string secretKey, string region)
         {
-            var options = new CredentialProfileOptions {
+            CredentialProfileOptions options = new CredentialProfileOptions {
                 AccessKey = accessKey,
                 SecretKey = secretKey
             };
 
-            var profile = new Amazon.Runtime.CredentialManagement.CredentialProfile(profileName, options);
+            CredentialProfile profile = new Amazon.Runtime.CredentialManagement.CredentialProfile(profileName, options);
+            profile.Region = RegionEndpoint.GetBySystemName(region);
 
-            var file = Program.GetCredentialStore();
+            SharedCredentialsFile file = Program.GetCredentialStore();
             file.RegisterProfile(profile);
         }
 
         internal static void UnregisterAWSCredentialProfile(string profileName)
         {
-            var file = Program.GetCredentialStore();
+            SharedCredentialsFile file = Program.GetCredentialStore();
             file.UnregisterProfile(profileName);
         }
 
         internal static IEnumerable<CredentialProfile> ListAWSCredentialProfiles()
         {
-            var file = Program.GetCredentialStore();
+            SharedCredentialsFile file = Program.GetCredentialStore();
             return file.ListProfiles();
         }
 
@@ -245,7 +246,7 @@ namespace AWSDeploymentAssistant
 
         internal static CredentialProfile GetAWSCredentialProfile(string profileName)
         {
-            var file = Program.GetCredentialStore();
+            SharedCredentialsFile file = Program.GetCredentialStore();
 
             CredentialProfile profile;
             file.TryGetProfile(profileName, out profile);
@@ -255,20 +256,20 @@ namespace AWSDeploymentAssistant
 
         public static AWSCredentials GetAWSCredentials(string profileName)
         {
-            AWSCredentials credendial = null;
+            AWSCredentials credential = null;
 
-            var file = Program.GetCredentialStore();
+            SharedCredentialsFile file = Program.GetCredentialStore();
 
             CredentialProfile profile;
             file.TryGetProfile(profileName, out profile);
 
             if (profile != null) {
-                credendial = profile.GetAWSCredentials(file);
+                credential = profile.GetAWSCredentials(file);
             }
 
             Program.Logger.Debug(string.Format("Request for profile [{0}] returned [{1}]", profileName, profile));
 
-            return credendial;
+            return credential;
         }
 
         private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
@@ -280,7 +281,7 @@ namespace AWSDeploymentAssistant
 
                 DirectoryInfo applicationPath = executingFile.Directory;
 
-                var assemblyFiles = applicationPath.GetFiles("*.dll", SearchOption.AllDirectories);
+                FileInfo[] assemblyFiles = applicationPath.GetFiles("*.dll", SearchOption.AllDirectories);
 
                 foreach (FileInfo assemblyFile in assemblyFiles) {
                     Assembly assembly = Assembly.LoadFile(assemblyFile.FullName);

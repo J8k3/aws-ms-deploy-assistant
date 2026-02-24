@@ -102,7 +102,7 @@ namespace CodeDeployPlugin
                 }
                 else
                 {
-                    Program.Logger.Info("    An AppSpec file was found in the working directory. This plug-in will not generate an AppSec.");
+                    Program.Logger.Info("    An AppSpec file was found in the working directory. This plug-in will not generate an AppSpec.");
                 }
             }
             catch (Exception ex)
@@ -188,15 +188,8 @@ namespace CodeDeployPlugin
             return appSpec;
         }
 
-        internal virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                this.Dispose();
-            }
-        }
-
         public void Dispose()
-        { }
+        {
+        }
     }
 }

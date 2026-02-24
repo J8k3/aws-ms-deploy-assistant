@@ -63,7 +63,7 @@ namespace AWSDeploymentAssistant
             }
         }
 
-        [Option("source", Required = true, HelpText = "The path to the build output source files that will be packaged and uploaded to s3. If using this tool in an MSBuild post build event, you this could be the $(TargetDir) environment variable.")]
+        [Option("source", Required = true, HelpText = "The path to the build output source files that will be packaged and uploaded to s3. If using this tool in an MSBuild post build event, this could be the $(TargetDir) environment variable.")]
         public string SourcePath
         {
             get
