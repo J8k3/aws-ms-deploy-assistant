@@ -1,12 +1,13 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
     <RootNamespace>CodeDeployPlugin</RootNamespace>
     <AssemblyName>CodeDeployPlugin</AssemblyName>
     <Configurations>Debug;Release;Deploy</Configurations>
     <LangVersion>latest</LangVersion>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <Deterministic>false</Deterministic>
+    <Title>AWS Deployment Assistant CodeDeployPlugin</Title>
+    <Description>This plugin prepares build output for deployment with CodeDeploy.</Description>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
@@ -30,9 +31,7 @@
     <ProjectReference Include="..\AWSDeploymentAssistant\AWSDeploymentAssistant.csproj" PrivateAssets="All" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Include="..\Solution Items\Properties\GlobalAssemblyInfo.cs" Link="Properties\GlobalAssemblyInfo.cs" />
-  </ItemGroup>
+
 
   <ItemGroup>
     <EmbeddedResource Include="Resources\defaultBeforeInstall.ps1" />

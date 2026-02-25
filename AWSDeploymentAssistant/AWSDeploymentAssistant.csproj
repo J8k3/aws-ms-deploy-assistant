@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
     <OutputType>Exe</OutputType>
@@ -6,8 +6,9 @@
     <AssemblyName>AWSDeploymentAssistant</AssemblyName>
     <Configurations>Debug;Release;Deploy</Configurations>
     <LangVersion>latest</LangVersion>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <Deterministic>false</Deterministic>
+    <Title>AWS Deployment Assistant</Title>
+    <Description>This tool enables automation of build output upload to the AWS S3 service.</Description>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,9 +24,7 @@
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="8.0.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Include="..\Solution Items\Properties\GlobalAssemblyInfo.cs" Link="Properties\GlobalAssemblyInfo.cs" />
-  </ItemGroup>
+
 
   <ItemGroup>
     <None Include="..\Readme.md" Link="Readme.md" CopyToOutputDirectory="Always" />

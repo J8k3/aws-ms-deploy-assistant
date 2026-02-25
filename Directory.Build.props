@@ -1,0 +1,10 @@
+<Project>
+  <PropertyGroup>
+    <Company>Jacob Marks</Company>
+    <Product>AWS Deployment Assistant</Product>
+    <Copyright>Copyright © 2016 Amazon.com, Inc. or its affiliates. Forked and maintained by Jacob Marks.</Copyright>
+    <Authors>Jacob Marks</Authors>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.*</AssemblyVersion>
+  </PropertyGroup>
+</Project>
