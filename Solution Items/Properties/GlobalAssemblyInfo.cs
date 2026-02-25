@@ -7,10 +7,9 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Amazon Web Services")]
+[assembly: AssemblyCompany("Jacob Marks")]
 [assembly: AssemblyProduct("AWS Deployment Assistant")]
-[assembly: AssemblyCopyright("Copyright 2016-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.")]
-[assembly: AssemblyCulture("")]
+[assembly: AssemblyCopyright("Copyright © 2016 Amazon.com, Inc. or its affiliates. Forked and maintained by Jacob Marks.")]
 [assembly: AssemblyMetadata("Author", "Jacob Marks")]
 [assembly: ComVisible(false)]
+[assembly: AssemblyVersion("1.0.0.*")]

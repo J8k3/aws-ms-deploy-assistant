@@ -10,5 +10,3 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("DemoSite")]
 [assembly: AssemblyDescription("")]
 [assembly: Guid("f35edda8-86e2-4370-b347-b681a79ed2ae")]
-[assembly: AssemblyVersion("1.0.0.*")]
-[assembly: AssemblyFileVersion("1.0.0.0")]

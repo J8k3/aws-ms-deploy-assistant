@@ -6,6 +6,7 @@
 // under the License.
 using Amazon;
 using Amazon.Runtime;
+using Amazon.Runtime.Credentials;
 using Amazon.S3;
 using Amazon.S3.Model;
 using AWSDeploymentAssistant.Properties;
@@ -17,8 +18,6 @@ using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
-using System.Web;
-using ZetaLongPaths;
 
 namespace AWSDeploymentAssistant
 {
@@ -46,10 +45,10 @@ namespace AWSDeploymentAssistant
             }
         }
 
-        internal ZlpDirectoryInfo TempContentDirectory
+        internal DirectoryInfo TempContentDirectory
         {
             get {
-                return new ZlpDirectoryInfo(Path.Combine(this.TempDirectory.FullName, "content"));
+                return new DirectoryInfo(Path.Combine(this.TempDirectory.FullName, "content"));
             }
         }
 
@@ -86,7 +85,7 @@ namespace AWSDeploymentAssistant
                 Program.Logger.Info("Serializing request object, temp directory object, temp content directory object and output file object.");
                 Program.Logger.Info(JsonConvert.SerializeObject(this.Request));
                 Program.Logger.Info(JsonConvert.SerializeObject(this.TempDirectory));
-                Program.Logger.Info(JsonConvert.SerializeObject((from f in this.TempContentDirectory.GetFileSystemInfos(SearchOption.AllDirectories)
+                Program.Logger.Info(JsonConvert.SerializeObject((from f in this.TempContentDirectory.GetFileSystemInfos("*", SearchOption.AllDirectories)
                                                                  select f.FullName)));
                 Program.Logger.Info(JsonConvert.SerializeObject(this.OutputFile.FullName));
 
@@ -127,7 +126,7 @@ namespace AWSDeploymentAssistant
 
             this.TempContentDirectory.Create();
 
-            ZlpDirectoryInfo sourceDirectory = new ZlpDirectoryInfo(this.Request.SourcePath);
+            DirectoryInfo sourceDirectory = new DirectoryInfo(this.Request.SourcePath);
 
             FileSystemUtil.CopyDirectory(sourceDirectory, this.TempContentDirectory, true);
         }
@@ -136,14 +135,14 @@ namespace AWSDeploymentAssistant
         {
             DirectoryInfo pluginDirectory = new DirectoryInfo(Program.TaskPluginFolderPath);
 
-            var assemblyFiles = pluginDirectory.GetFiles("*.dll", SearchOption.AllDirectories);
+            FileInfo[] assemblyFiles = pluginDirectory.GetFiles("*.dll", SearchOption.AllDirectories);
 
-            Program.Logger.InfoFormat("Found [{0}] plugin assemblies.", assemblyFiles.Count());
+            Program.Logger.InfoFormat("Found [{0}] plugin assemblies.", assemblyFiles.Length);
 
-            foreach (var assemblyFile in assemblyFiles) {
-                var assembly = Assembly.LoadFile(assemblyFile.FullName);
+            foreach (FileInfo assemblyFile in assemblyFiles) {
+                Assembly assembly = Assembly.LoadFile(assemblyFile.FullName);
 
-                var pluginTypes = (from type in assembly.GetTypes()
+                IEnumerable<Type> pluginTypes = (from type in assembly.GetTypes()
                                    where typeof(IDeploymentTask).IsAssignableFrom(type)
                                    select type);
 
@@ -151,13 +150,12 @@ namespace AWSDeploymentAssistant
 
                 List<IDeploymentTask> plugins = new List<IDeploymentTask>();
 
-                foreach (var pluginType in pluginTypes) {
-                    using (var plugin = (IDeploymentTask)(Activator.CreateInstance(pluginType.Assembly.FullName, pluginType.FullName).Unwrap())) {
-                        plugins.Add(plugin);
-                    }
+                foreach (Type pluginType in pluginTypes) {
+                    IDeploymentTask plugin = (IDeploymentTask)Activator.CreateInstance(pluginType);
+                    plugins.Add(plugin);
                 }
 
-                foreach (var plugin in plugins.OrderBy(p => p.Priority)) {
+                foreach (IDeploymentTask plugin in plugins.OrderBy(p => p.Priority)) {
                     try {
                         Program.Logger.InfoFormat("Executing [{0}] plugin.", plugin.GetType().FullName);
 
@@ -168,12 +166,12 @@ namespace AWSDeploymentAssistant
 
                             string fileName = string.Format("{0}.options.json", plugin.Name);
 
-                            var optionsFile = this.TempContentDirectory.GetFiles(fileName, SearchOption.TopDirectoryOnly).SingleOrDefault();
+                            FileInfo optionsFile = this.TempContentDirectory.GetFiles(fileName, SearchOption.TopDirectoryOnly).SingleOrDefault();
 
                             if (optionsFile != null) {
-                                var json = File.ReadAllText(optionsFile.FullName);
+                                string json = File.ReadAllText(optionsFile.FullName);
 
-                                var options = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+                                Dictionary<string, string> options = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
 
                                 plugin.Options.AddRange(options);
                             }
@@ -182,7 +180,7 @@ namespace AWSDeploymentAssistant
                         plugin.Execute(this.Request, this.TempContentDirectory);
                     }
                     catch (Exception ex) {
-                        var message = string.Format("Failed to execute [{0}] plugin.", plugin.GetType().FullName);
+                        string message = string.Format("Failed to execute [{0}] plugin.", plugin.GetType().FullName);
 
                         if (plugin.ThrowOnError) {
                             throw new InvalidOperationException(message, ex);
@@ -210,10 +208,10 @@ namespace AWSDeploymentAssistant
 
             Assert.FileDoesNotExist(this.OutputFile, "The package zip file already exists.");
 
-            using (var fileStream = new FileStream(this.OutputFile.FullName, FileMode.CreateNew)) {
-                using (var archive = new ZipArchive(fileStream, ZipArchiveMode.Create, true)) {
-                    var include = Settings.Default.PublishFileTypesIncludePattern.ToArray();
-                    var exclude = Settings.Default.PublishFileTypesExcludePattern.ToArray();
+            using (FileStream fileStream = new FileStream(this.OutputFile.FullName, FileMode.CreateNew)) {
+                using (ZipArchive archive = new ZipArchive(fileStream, ZipArchiveMode.Create, true)) {
+                    string[] include = Settings.Default.PublishFileTypesIncludePattern.ToArray();
+                    string[] exclude = Settings.Default.PublishFileTypesExcludePattern.ToArray();
 
                     archive.AddDirectory(this.TempContentDirectory, include, exclude);
                 }
@@ -241,16 +239,7 @@ namespace AWSDeploymentAssistant
                 credentials = Program.GetAWSCredentials(this.Request.AWSCredentialProfile);
             }
             else {
-                Amazon.Runtime.AppConfigAWSCredentials appConfig = new Amazon.Runtime.AppConfigAWSCredentials();
-
-                var appConfigCreds = appConfig.GetCredentials();
-
-                if ((appConfigCreds != null) && !string.IsNullOrEmpty(appConfigCreds.AccessKey) && !string.IsNullOrEmpty(appConfigCreds.SecretKey)) {
-                    credentials = new BasicAWSCredentials(appConfigCreds.AccessKey, appConfigCreds.SecretKey);
-                }
-                else {
-                    credentials = Program.GetAWSCredentials(Settings.Default.DefaultProfileName);
-                }
+                credentials = DefaultAWSCredentialsIdentityResolver.GetCredentials();
             }
 
             RegionEndpoint endpoint = RegionEndpoint.GetBySystemName(this.Request.Region);
@@ -265,10 +254,10 @@ namespace AWSDeploymentAssistant
                 };
 
                 if (this.Request.WhatIf == false) {
-                    PutObjectResponse putResponse = client.PutObject(request);
+                    PutObjectResponse putResponse = client.PutObjectAsync(request).Result;
 
                     if (putResponse.HttpStatusCode != System.Net.HttpStatusCode.OK) {
-                        throw new HttpException((int)putResponse.HttpStatusCode, "Failed to upload package to S3.");
+                        throw new InvalidOperationException($"Failed to upload package to S3. Status code: {putResponse.HttpStatusCode}");
                     }
                 }
             }

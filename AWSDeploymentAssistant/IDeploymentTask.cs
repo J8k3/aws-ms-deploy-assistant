@@ -7,7 +7,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using ZetaLongPaths;
 
 namespace AWSDeploymentAssistant
 {
@@ -23,6 +22,6 @@ namespace AWSDeploymentAssistant
 
         Dictionary<string, string> Options { get; }
 
-        void Execute(BuildRequest request, ZlpDirectoryInfo workingDirectory);
+        void Execute(BuildRequest request, DirectoryInfo workingDirectory);
     }
 }

@@ -28,6 +28,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		License.Newtonsoft.Json.txt = License.Newtonsoft.Json.txt
 		Notice.txt = Notice.txt
 		Readme.md = Readme.md
+		MODERNIZATION.md = MODERNIZATION.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Properties", "Properties", "{2F69F15F-D898-42A9-993C-D736E18AD89D}"

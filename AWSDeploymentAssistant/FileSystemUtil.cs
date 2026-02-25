@@ -5,40 +5,36 @@
 // KIND, either express or implied. See the License for the specific language governing permissions and limitations
 // under the License.
 using System.IO;
-using ZetaLongPaths;
 
 namespace AWSDeploymentAssistant
 {
     public static class FileSystemUtil
     {
-        internal static void CopyDirectory(ZlpDirectoryInfo source, ZlpDirectoryInfo destination, bool copySubDirs)
+        internal static void CopyDirectory(DirectoryInfo source, DirectoryInfo destination, bool copySubDirs)
         {
             Assert.DirectoryExists(source);
 
-            if (destination.Exists == false)
+            if (!destination.Exists)
             {
                 destination.Create();
             }
 
-            ZlpFileInfo[] sourceFiles = source.GetFiles();
+            FileInfo[] sourceFiles = source.GetFiles();
 
-            foreach (ZlpFileInfo sourceFile in sourceFiles)
+            foreach (FileInfo sourceFile in sourceFiles)
             {
                 string destinationFilePath = Path.Combine(destination.FullName, sourceFile.Name);
-
                 sourceFile.CopyTo(destinationFilePath, false);
             }
 
             if (copySubDirs)
             {
-                ZlpDirectoryInfo[] sourceDirectories = source.GetDirectories();
+                DirectoryInfo[] sourceDirectories = source.GetDirectories();
 
-                foreach (ZlpDirectoryInfo sourceDirectory in sourceDirectories)
+                foreach (DirectoryInfo sourceDirectory in sourceDirectories)
                 {
                     string destinationDirectoryPath = Path.Combine(destination.FullName, sourceDirectory.Name);
-
-                    ZlpDirectoryInfo destinationDirectory = new ZlpDirectoryInfo(destinationDirectoryPath);
-
+                    DirectoryInfo destinationDirectory = new DirectoryInfo(destinationDirectoryPath);
                     FileSystemUtil.CopyDirectory(sourceDirectory, destinationDirectory, copySubDirs);
                 }
             }
