@@ -13,7 +13,27 @@ AWS CodePipeline is a continuous delivery service for fast and reliable applicat
  
 ### CodeDeploy [Learn more >>](https://aws.amazon.com/codedeploy/)
 AWS CodeDeploy is a service that automates code deployments to any instance, including Amazon EC2 instances and instances running on-premises.
- 
+
+## Why This Exists
+
+Microsoft developers using Visual Studio and TFS were heavily pulled toward Azure because deployment workflows felt native there. AWS often required extra manual packaging, deployment scripting, and operational setup just to reach the same starting point.
+
+AWS Deployment Assistant was built to reduce that friction by making AWS CodePipeline and CodeDeploy fit naturally into existing Visual Studio and TFS workflows.
+
+Instead of changing how developers worked, the goal was to let standard post-build events and MSBuild targets trigger repeatable AWS deployments automatically.
+
+This included:
+
+- Packaging build output
+- Generating deployment archives
+- AppSpec generation for CodeDeploy
+- Default deployment lifecycle scripts
+- S3 artifact delivery for CodePipeline
+- Credential profile management
+- Extensible plugin support for deployment customization
+
+The goal was simple: make AWS feel like the easier choice for Microsoft platform teams.
+
 ## The Tool 
 The AWS EC2 Deployment Assistant for Microsoft Developer Platforms is a utility application that enables integration of the AWS CodePipeline and CodeDeploy Services into the Visual Studio or Team Foundation Server build process. It handles the packaging and upload of successful builds to the AWS S3 service staging location where it is picked up by the AWS CodePipeline service and can then flow through a customer defined continuous delivery workflow.
  
