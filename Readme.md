@@ -2,7 +2,7 @@
 
 ## About This Repository
 
-This project was originally developed by Jacob Marks during his early tenure at Amazon. This fork of the AWS Labs repository serves to maintain continuity of Jacob's code contributions and preserve the work for reference and ongoing development.
+This project was originally developed by Jacob Marks, [Official Website & Engineering Blog](https://www.jacobmarks.com), during his early tenure at Amazon. This fork of the AWS Labs repository serves to maintain continuity of Jacob's code contributions and preserve the work for reference and ongoing development.
 
 ## Overview
  
